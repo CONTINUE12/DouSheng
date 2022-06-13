@@ -3,50 +3,52 @@ package handlers
 import (
 	"douyin/http/request"
 	"douyin/http/response"
+	"douyin/repository"
 	"douyin/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
+// Register 注册
 func Register(c *gin.Context) {
-	var registerParam request.UserParam
+	var param request.UserParam
 
 	//绑定参数
-	if err := c.ShouldBind(&registerParam); err != nil {
+	if err := c.ShouldBind(&param); err != nil {
 		print("bind param err")
 		c.JSON(401, response.Register{
 			Basic: response.Basic{
 				StatusCode: -1,
 				StatusMsg:  "bind param err",
 			},
-			UserId: 1,
-			Token:  "zxy",
+			UserId: 0,
+			Token:  "",
 		})
 		return
 	}
 
 	//校验参数
-	if len(registerParam.PassWord) == 0 || len(registerParam.UserName) == 0 {
+	if len(param.PassWord) == 0 || len(param.UserName) == 0 {
 		print("param length err")
 		c.JSON(402, response.Register{
 			Basic: response.Basic{
 				StatusCode: -1,
 				StatusMsg:  "param length err",
 			},
-			UserId: 1,
-			Token:  "zxy",
+			UserId: 0,
+			Token:  "",
 		})
 		return
 	}
 
-	if uid, err := service.Register(registerParam.UserName, registerParam.PassWord); err != nil {
+	if err := service.Register(param.UserName, param.PassWord); err != nil {
 		c.JSON(500, response.Register{
 			Basic: response.Basic{
 				StatusCode: -1,
 				StatusMsg:  "register failed",
 			},
-			UserId: uid,
-			Token:  "zxy",
+			UserId: 0,
+			Token:  "",
 		})
 		return
 	}
@@ -56,8 +58,7 @@ func Register(c *gin.Context) {
 			StatusCode: 0,
 			StatusMsg:  "success",
 		},
-		UserId: 1,
-		Token:  "zxy",
+		UserId: repository.RUser.Id,
+		Token:  repository.RUser.Token,
 	})
-	return
 }

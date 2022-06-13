@@ -8,15 +8,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// FollowList 关注列表
 func FollowList(c *gin.Context) {
-	var followParam request.RelationParam
+	var param request.RelationParam
 
-	if err := c.ShouldBind(&followParam); err != nil {
-		c.JSON(500, response.Basic{StatusCode: -1, StatusMsg: "bind param failed"})
+	if err := c.ShouldBind(&param); err != nil {
+		c.JSON(500, response.FollowList{
+			Basic:    response.Basic{StatusCode: -1, StatusMsg: "bind param failed" + err.Error()},
+			UserList: []repository.User{},
+		})
+		return
 	}
 
-	if err := service.FollowList(followParam.UserId, followParam.Token); err != nil {
-		c.JSON(500, response.Basic{StatusCode: -1, StatusMsg: "failed to get follow"})
+	if err := service.FollowList(param.UserId, param.Token); err != nil {
+		c.JSON(500, response.FollowList{
+			Basic:    response.Basic{StatusCode: -1, StatusMsg: "failed to get follow"},
+			UserList: []repository.User{},
+		})
 		return
 	}
 

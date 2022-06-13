@@ -31,6 +31,12 @@ type Login struct {
 	Token  string `json:"token"`
 }
 
+// Info 用户信息
+type Info struct {
+	Basic
+	User repository.User `json:"user"`
+}
+
 // FollowList 关注列表
 type FollowList struct {
 	Basic

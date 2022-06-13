@@ -1,22 +1,36 @@
 package handlers
 
 import (
+	"douyin/http/request"
 	"douyin/http/response"
 	"douyin/repository"
 	"douyin/service"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"strconv"
+	"time"
 )
 
+// Feed 视频流接口
 func Feed(c *gin.Context) {
-	latestStr := c.Query("latest_time")
-	latestTime, _ := strconv.ParseInt(latestStr, 10, 64)
-	token := c.Query("token")
+	var param request.FeedParam
 
-	if err := service.GetLatestVideo(latestTime, token); err != nil {
-		c.JSON(500, response.Basic{
-			StatusCode: -1,
-			StatusMsg:  "feed failed"})
+	if err := c.ShouldBind(&param); err != nil {
+		c.JSON(500, response.Feed{
+			Basic:     response.Basic{StatusCode: -1, StatusMsg: "failed to bind params"},
+			VideoList: nil,
+			NextTime:  time.Now().Unix(),
+		})
+		fmt.Printf("bind param failed")
+		return
+	}
+
+	if err := service.GetLatestVideo(param.LatestTime, param.Token); err != nil {
+		c.JSON(500, response.Feed{
+			Basic:     response.Basic{StatusCode: -1, StatusMsg: "failed to get latest video from sql"},
+			VideoList: nil,
+			NextTime:  time.Now().Unix(),
+		})
+		fmt.Printf("get video failed" + err.Error())
 		return
 	}
 

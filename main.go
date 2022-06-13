@@ -1,6 +1,7 @@
 package main
 
 import (
+	"douyin/consts"
 	"douyin/handlers"
 	"douyin/repository"
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -17,7 +18,6 @@ func main() {
 
 	//初始化路由
 	Router()
-
 }
 
 func Init() error {
@@ -30,6 +30,10 @@ func Init() error {
 func Router() {
 	r := gin.Default()
 
+	//设置静态资源路径
+	r.Static("/cover/", consts.CoverPath)
+	r.Static("/video/", consts.VideoPath)
+
 	//公共前置路由douyin
 	douyin := r.Group("/douyin")
 
@@ -38,7 +42,7 @@ func Router() {
 
 	user.POST("/login/", handlers.Login)       //登录
 	user.POST("/register/", handlers.Register) //注册
-	user.GET("/", handlers.DealLogin)          //登录之后的处理
+	user.GET("/", handlers.UserInfo)           //登录之后的处理
 
 	//视频接口
 	video := douyin
@@ -54,7 +58,7 @@ func Router() {
 	//视频点赞接口
 	favorite := video.Group("/favorite")
 
-	favorite.POST("/action/", handlers.Favorite)
+	favorite.POST("/action/", handlers.FavoriteAction)
 	favorite.GET("/list/", handlers.FavoriteList)
 
 	//视频评论接口
@@ -66,7 +70,7 @@ func Router() {
 	//关系接口
 	relation := douyin.Group("/relation")
 
-	relation.POST("/action/", handlers.Action)
+	relation.POST("/action/", handlers.FollowAction)
 	relation.GET("/follow/list/", handlers.FollowList)
 	relation.GET("/follower/list/", handlers.FollowerList)
 

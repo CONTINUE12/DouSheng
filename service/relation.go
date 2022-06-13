@@ -2,13 +2,23 @@ package service
 
 import "douyin/repository"
 
-func Relation(userId, toUserId, actionType int64, token string) error {
-	if err := repository.Add(userId, toUserId, actionType, token); err != nil {
+// AddRelation 添加关注
+func AddRelation(toUserId int64, token string) error {
+	if err := repository.AddRelation(toUserId, token); err != nil {
 		return err
 	}
 	return nil
 }
 
+// DelRelation 取消关注
+func DelRelation(toUserId int64, token string) error {
+	if err := repository.DelRelation(toUserId, token); err != nil {
+		return err
+	}
+	return nil
+}
+
+// FollowList 关注列表
 func FollowList(userId int64, token string) error {
 	if err := repository.FollowList(userId, token); err != nil {
 		return err
@@ -16,6 +26,7 @@ func FollowList(userId int64, token string) error {
 	return nil
 }
 
+// FollowerList 粉丝列表
 func FollowerList(toUserId int64, token string) error {
 	if err := repository.FollowerList(toUserId, token); err != nil {
 		return err
